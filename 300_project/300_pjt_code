@@ -1,0 +1,92 @@
+%For Table II. Is from 1959 to 2008 so I use set up t to present those year This is first approach.
+t = 1959 :2008
+% the population p is those values on Table
+p= [6.72 6.62 6.59 6.73 6.91 7.04 7.25 7.45 7.63 7.85 8.07 8.30 8.52 8.71 8.92 9.09 9.24 9.37 9.5 9.63 9.75 9.87 10.01 10.17 10.30 10.44 10.59 10.75 10.93 11.10 11.27 11.43 11.58 11.71 11.85 11.98 12.11 12.23 12.36 12.47 12.57 12.67 12.76 12.85 12.92 13.00 13.08 13.14 13.21 13.28]
+% make the year scale start from 1950
+t = t -1950 
+%define initial values lets say 1for 50 yrs 1959 -2008
+v = ones (1,50)
+%Then model with polynomial 9 times
+m = polyfit (t,p,9)
+% more accurate  points
+n =linspace (5,65,1000)
+% seek for the result
+r = polyval (m,n)
+% plot and label also hold the plot
+plot (n,r)
+xlabel (‘years’),ylabel(‘population per hundred million’)
+% now type equation in for two ends x0 and x2 first end is 0 1 2 last end is 48 49 50 three terms in EQ2 & 3 create function also EQ4  for rest part file equations.m 
+% 50years
+for n = 1:50
+%first end EQ2
+if n<=2 
+v(n) = (-3*p(n)+4*p(n+1)-p(n+2))/(2*(t(n+1)-t(n))) 
+%last end EQ3
+else if n<=48
+ v(n) = (p(n-2)-8*p(n-1)+8*p(n+1)-p(n+2))/(12*(t(n)-t(n-1)))
+%other case
+      else
+              v(n) = (3*p(n)-4*p(n-1)+p(n-2))/(2*(t(n)-t(n-1)))
+      end
+  end
+end
+%now ready to plot
+disp ([t',v'])
+% discrete plot as stars
+plot (t,v,’*’);
+xlabel (‘years’),ylabel(‘growthrate’)
+% now we can model with our equation see how well it looks
+hold on
+a = polyfit(t,v,9)
+T=linspace(5,65,1000)
+V= polyval(a,T)
+plot(T,V)
+%limited axis X form 0to 70 y from -1 to 1
+axis([0,70,-1,1]);
+%clear for next model
+clc
+clear all
+---------------------------------------------------------------------------
+% the exponential model so the year is the same 1950 to 2008
+t = 1959:2008
+% enter the value of the function the mount of population 
+x(t)= [6.72 6.62 6.59 6.73 6.91 7.04 7.25 7.45 7.63 7.85 8.07 8.30 8.52 8.71 8.92 9.09 9.24 9.37 9.5 9.63 9.75 9.87 10.01 10.17 10.30 10.44 10.59 10.75 10.93 11.10 11.27 11.43 11.58 11.71 11.85 11.98 12.11 12.23 12.36 12.47 12.57 12.67 12.76 12.85 12.92 13.00 13.08 13.14 13.21 13.28]
+% enter EQ7 EQ6
+y = log(x(t)), a=polyfit(t,y,1), r=a(1),x0=exp(a(2)) 
+x1=x0.*exp(r.*t)
+%ready to plot the red line is data the blue line is the function  
+Lets use these two colors here. More easier to compare
+plot(t,x(t),’r’,t,x1,’b’)
+%label 
+xlabel (‘years’),ylabel(‘population per hundred million’)
+%for 2010 estimation r=0.015 x0=1.3248e-12 and we have completer equation
+t =2010
+x0 = 1.3248e-12
+x(t)=x0*exp(0.0150*t)
+---------------------------------------------------------------------------
+% The last model I will sample every 4 yrs from 1959until 2007 so the data will be 6.72 6.91 7.63 8.52 9.24 9.75 10.30 10.93 11.58 12.11 12.57 12.92 13.14
+x=1959:4:2007
+%function file approach3_curvefit 
+function f=approach3_curvefit ( a,t )
+%Based EQ9
+    f=a(1)./(1+(a(1)/3.9-1)*exp(-a(2)*(t-1950)));
+end
+y=[6.72 6.91 7.63 8.52 9.24 9.75 10.30 10.93 11.58 12.11 12.57 12.92 13.21]
+%plot those data as discrete value and connect as a line
+plot(x,y,'*',x,y)
+%hold it later for ploy our model
+hold on
+% set up a0 initial value 
+a0=[0.001,1]
+%non-linear curve-fit the function file is at bottom
+a= lsqcurvefit('approach3_curvefit',a0,x,y)
+%display the result
+disp(['a=' num2str(a)])
+%predict from 1959 to 2020 every 2years
+xi=1959:2:2020
+%pass value into the function get result
+yi=approach3_curvefit(a,xi)
+%ready for plot
+plot (xi,yi,'r')
+%label
+xlabel ('year'),ylabel ('population unit/hunderd million')
